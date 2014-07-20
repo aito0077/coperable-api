@@ -1,6 +1,7 @@
 var mongoose = require('mongoose/'),
     util = require('util'),
     us = require('underscore'),
+    async = require("async"),
     Schema = mongoose.Schema;
 
 
@@ -49,6 +50,7 @@ var IniciativaSchema = new Schema({
         latitude: {type: Number, default: 0},
         longitude: {type: Number, default: 0}
     },
+    coords: [Number, Number],
     networks: {
         facebook: {
             text: String
@@ -73,6 +75,18 @@ var IniciativaSchema = new Schema({
     modification_date: { type: Date, default: Date.now }
 });
 
+IniciativaSchema.virtual('convocatoria').get(function () {
+  return this.current_stage == 'PREPARACION';
+});
+
+IniciativaSchema.virtual('activando').get(function () {
+  return this.current_stage == 'ACTIVO';
+});
+
+IniciativaSchema.virtual('finalizada').get(function () {
+  return this.current_stage == 'FINALIZADO';
+});
+
 var Iniciativa = mongoose.model('Iniciativa', IniciativaSchema);
 
 exports.Model = Iniciativa;
@@ -80,14 +94,13 @@ exports.Model = Iniciativa;
 var limit = 20;
 
 exports.list = function(success) {
-  Iniciativa.find().where('profile_picture').exists(true).limit(limit).execFind(function (err, data) {
+  Iniciativa.find().where('profile_picture').exists(true).sort('-start_date').limit(limit).execFind(function (err, data) {
     success(data);
   });
 };
 
 exports.participate = function(id, success) {
   Iniciativa.findOne({code: id}).exec(function(err, result) {
-        console.dir(result);
         console.log(err);
         if(result) {
             res.send(result);
@@ -106,11 +119,12 @@ exports.insert = function(iniciativa, success, error) {
     var default_values = {
         creation_date: new Date(),
         modification_date: new Date(),
-        current_stage: 'PREPARACION',
+        coords: [iniciativa.location.longitude || 0, iniciativa.location.latitude || 0],
         location: {
-            latitude: iniciativa.latitude,
-            longitude: iniciativa.longitude
+            latitude: iniciativa.location.latitude,
+            longitude: iniciativa.location.longitude
         },
+        current_stage: 'PREPARACION',
         stages: [{
             stage: 'PREPARACION',
             description: 'PREPARACION',
@@ -118,19 +132,21 @@ exports.insert = function(iniciativa, success, error) {
         }]
     },
     persist = {};
-    console.dir(iniciativa);
-    us.extend(persist, default_values, iniciativa);
-    console.dir(persist);
+    us.extend(persist, default_values, iniciativa, {coords: [default_values.location.longitude || 0, default_values.location.latitude || 0]});
     persist.main_category = us.first(us.filter(us.keys(persist.categories), function(categ) {
-        console.dir(categ);
         return persist.categories[categ];
     }));
-    console.dir(persist);
+    coords = [];
+    coords[0] = default_values.location.longitude || 0;
+    coords[1] = default_values.location.latitude || 0;
+    persist.coords = coords;
     var iniciativa_model = new Iniciativa(persist);
     iniciativa_model.save(function(err, data) {
         if(err) {
+            console.log(err);
             error(err);
         } else {
+            console.log('exito en crear iniciativa: '+data._id);
             success(data);
         }
     });
@@ -156,4 +172,32 @@ exports.remove = function(id, success, error) {
         }
     });
 };
+
+exports.update_status = function(success, error) {
+    var today = new Date().setHours(0);
+        tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+
+    Iniciativa.find({end_date: { $gt: today}, end_date: { $lt: tomorrow}, current_stage: 'PREPARACION'}).execFind(function (err, data) {
+        console.dir(data);
+    });
+    async.parallel({
+        to_active: function(sub_callback) {
+            console.log('to_Active');
+            Iniciativa.update({end_date: { $gt: today}, end_date: { $lt: tomorrow}, current_stage: 'PREPARACION'}, {$set: {current_stage: 'ACTIVO'}}, {multi:true}, sub_callback);
+        },
+        to_finish: function(sub_callback) {
+            console.log('to_finish');
+            Iniciativa.update({end_date: { $lt: tomorrow}}, {$set: {current_stage: 'FINALIZADO'}}, {multi:true}, sub_callback);
+        }},
+        function(err, results) {
+            console.log('end');
+            success();
+        }
+
+    );
+	
+
+};
+
+
 

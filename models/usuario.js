@@ -15,6 +15,8 @@ var UsuarioSchema = new Schema({
     twitter_id:   String,
     authenticate_with: String,
     birthdate: Date,
+    picture: String,
+    picture_thumb: String,
     about: String,
     cantidad_iniciativas:  {type: Number, default: 0},
     iniciativas:    [{
@@ -114,7 +116,6 @@ exports.get = function(id, success) {
 
 exports.alreadyExists = function(id, success, wrong) {
   Usuario.find({username: id}).limit(limit).execFind(function (arr,data) {
-    console.dir(data);
     if(typeof data[0] !== 'undefined') {
         console.log('Username already exists');
         wrong({error: 'username_already_exists'});
@@ -133,8 +134,10 @@ exports.insert = function(usuario, success, error) {
     var usuario_model = new Usuario(usuario);
     usuario_model.save(function(err, data) {
         if(err) {
+            console.log(err);
             error(err);
         } else {
+            console.log('usuario creado');
             success(data);
         }
     });

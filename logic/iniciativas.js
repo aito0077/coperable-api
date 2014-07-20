@@ -13,11 +13,25 @@ exports.list = function(req, res, next) {
     );
 };
 
+exports.browseByUser = function(req, res, next) {
+    var user_id = req.params.user_id; 
+
+    console.log('Buscando por usuario: '+user_id);
+    Iniciativa.Model.find('{owner.user:user_id}').exec(
+        function (err, iniciativas) {
+            if (err) return handleError(err);
+            res.send(iniciativas);
+        }
+    );
+
+};
+
 exports.browseByCategory = function(req, res, next) {
     var category = req.params.category; 
 
     console.log('Buscando por categoria: '+category);
-    Iniciativa.Model.find().where('categories.'+category).where('profile_picture').exists(true).equals(true).exec(
+    Iniciativa.Model.find().where('profile_picture').exists(true).where('categories.'+category).equals(true).exec(
+    //Iniciativa.Model.find('{categories.'+category+': true, profile_picture:{$exists:true}}').equals(true).exec(
         function (err, iniciativas) {
             if (err) return handleError(err);
             res.send(iniciativas);
@@ -32,24 +46,26 @@ exports.create = function(req, res, next) {
         body,
         function(data) {
             usuario.Model.findById(body.owner.user).exec(function (err, user) {
-                user.update({ 
-                        $inc: {
-                            'cantidad_iniciativas':1
+                if(user) {
+                    user.update({ 
+                            $inc: {
+                                'cantidad_iniciativas':1
+                            },
+                            $push: {
+                                'iniciativas': {
+                                    id: data._id,
+                                    title: body.title,
+                                    description: body.description,
+                                    picture: body.profile_picture,
+                                    owner: true
+                                }
+                            }   
                         },
-                        $push: {
-                            'iniciativas': {
-                                id: data._id,
-                                title: body.title,
-                                description: body.description,
-                                picture: body.profile_picture,
-                                owner: true
-                            }
-                        }   
-                    },
-                    function() {
-                        res.send(data);
-                    } 
-                );
+                        function() {
+                            res.send(data);
+                        } 
+                    );
+                }
             });
 
         },
@@ -152,3 +168,27 @@ exports.findByName = function(req, res, next) {
     });
 };
 
+
+exports.findLast = function(req, res, next) {
+    console.dir(req.params);
+    var lat = req.params.lat,
+        lng = req.params.lng,
+	toFind = new Date();
+
+    Iniciativa.Model.find({end_date: { $gt: new Date().setDate(toFind.getDate() - 1)}, coords: { $near : [lng, lat], $maxDistance : 500/111.2}}).where('profile_picture').exists(true).sort('-start_date').exec(function(err, result) {
+    //Iniciativa.Model.find({end_date: { $gt: new Date()}, coords: { $near : [lng, lat], $maxDistance : 500/111.2}}).where('profile_picture').exists(true).sort('-start_date').exec(function(err, result) {
+        console.dir(result);
+        if(result) {
+            res.send(result);
+        } else {
+            res.send(404, {});
+        }
+    });
+};
+
+
+exports.update_status = function(success) {
+    Iniciativa.update_status(function(s) {
+        success();
+    });
+};
