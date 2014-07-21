@@ -94,7 +94,7 @@ exports.Model = Iniciativa;
 var limit = 20;
 
 exports.list = function(success) {
-  Iniciativa.find().where('profile_picture').exists(true).sort('-start_date').limit(limit).execFind(function (err, data) {
+  Iniciativa.find().where('profile_picture').exists(true).sort('-start_date').limit(limit).exec(function (err, data) {
     success(data);
   });
 };
@@ -177,7 +177,7 @@ exports.update_status = function(success, error) {
     var today = new Date().setHours(0);
         tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
 
-    Iniciativa.find({end_date: { $gt: today}, end_date: { $lt: tomorrow}, current_stage: 'PREPARACION'}).execFind(function (err, data) {
+    Iniciativa.find({end_date: { $gt: today}, end_date: { $lt: tomorrow}, current_stage: 'PREPARACION'}).exec(function (err, data) {
         console.dir(data);
     });
     async.parallel({

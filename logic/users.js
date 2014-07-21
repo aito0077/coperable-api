@@ -27,8 +27,10 @@ exports.listOwners = function(req, res, next) {
 
 exports.create = function(req, res, next) {
     var body = req.body;
+    console.log("[users.js create] Creating new user: ");
     console.dir(body);
     usuario.alreadyExists(body.username, function(results) {
+        console.log("[users.js create] Inserting new user;")
         usuario.insert(
             body,
             function(data) {

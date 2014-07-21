@@ -99,13 +99,13 @@ var Usuario = mongoose.model('Usuario', UsuarioSchema);
 exports.Model = Usuario;
 
 exports.list = function(success) {
-  Usuario.find().limit(limit).select('username first_name last_name email location iniciativas').execFind(function (arr,data) {
+  Usuario.find().limit(limit).select('username first_name last_name email location iniciativas').exec(function (arr,data) {
     success(data);
   });
 };
 
 exports.listOwners = function(success) {
-  Usuario.find().limit(limit).select('username first_name last_name email location iniciativas').execFind(function (arr,data) {
+  Usuario.find().limit(limit).select('username first_name last_name email location iniciativas').exec(function (arr,data) {
     success(data);
   });
 };
@@ -115,11 +115,12 @@ exports.get = function(id, success) {
 };
 
 exports.alreadyExists = function(id, success, wrong) {
-  Usuario.find({username: id}).limit(limit).execFind(function (arr,data) {
+  Usuario.find({username: id}).limit(limit).exec(function (arr,data) {
     if(typeof data[0] !== 'undefined') {
-        console.log('Username already exists');
+        console.log('[logic/users.js alreadyExists] User [' + id + '] already exists');
         wrong({error: 'username_already_exists'});
     } else {
+        console.log('[logic/users.js alreadyExists] User [' + id + '] does not exist');
         success(data);
     }
   });
@@ -137,7 +138,7 @@ exports.insert = function(usuario, success, error) {
             console.log(err);
             error(err);
         } else {
-            console.log('usuario creado');
+            console.log('[logic/users.js insert] usuario creado');
             success(data);
         }
     });

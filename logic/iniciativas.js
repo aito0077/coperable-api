@@ -42,6 +42,8 @@ exports.browseByCategory = function(req, res, next) {
 
 exports.create = function(req, res, next) {
     var body = req.body;
+    console.log("[iniciativa.js create] Craetung new Iniciativa:");
+    console.dir(body);
     Iniciativa.insert(
         body,
         function(data) {
