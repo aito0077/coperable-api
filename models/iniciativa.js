@@ -87,6 +87,10 @@ IniciativaSchema.virtual('finalizada').get(function () {
   return this.current_stage == 'FINALIZADO';
 });
 
+IniciativaSchema.index ({
+       coords : "2d"
+});
+
 var Iniciativa = mongoose.model('Iniciativa', IniciativaSchema);
 
 exports.Model = Iniciativa;

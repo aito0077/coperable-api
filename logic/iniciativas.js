@@ -170,22 +170,36 @@ exports.findByName = function(req, res, next) {
     });
 };
 
-
+/**
+ * Returns all the iniciativas near a given lat and log whose endDate is posterior to yesterday.
+ */
 exports.findLast = function(req, res, next) {
+    console.log("[iniciativa.js findLast] Fetching last iniciativas:");
     console.dir(req.params);
     var lat = req.params.lat,
         lng = req.params.lng,
-	toFind = new Date();
+        yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
 
-    Iniciativa.Model.find({end_date: { $gt: new Date().setDate(toFind.getDate() - 1)}, coords: { $near : [lng, lat], $maxDistance : 500/111.2}}).where('profile_picture').exists(true).sort('-start_date').exec(function(err, result) {
-    //Iniciativa.Model.find({end_date: { $gt: new Date()}, coords: { $near : [lng, lat], $maxDistance : 500/111.2}}).where('profile_picture').exists(true).sort('-start_date').exec(function(err, result) {
-        console.dir(result);
-        if(result) {
-            res.send(result);
-        } else {
-            res.send(404, {});
+    Iniciativa.Model.find(
+        {
+            end_date: { $gt: yesterday },
+            coords:
+            {
+                $near : [lng, lat],
+                $maxDistance : 500/111.2
+            }
+        }).where('profile_picture').exists(true).sort('-start_date')
+        .exec(function(err, result) {
+            if(result) {
+                console.log("[iniciativa.js findLast] Resultados: " + result.length);
+                res.send(result);
+            } else {
+                console.log("[iniciativa.js findLast] Resultados: 0");
+                res.send(404, {});
+            }
         }
-    });
+    );
 };
 
 
