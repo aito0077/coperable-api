@@ -76,9 +76,8 @@ exports.authenticate = function(req, res, next) {
 
 exports.findById = function(req, res, next) {
     var user_id = req.params.id;
-    console.log("Find by Id: "+user_id);
+    console.log("Find by Id: " + user_id);
     usuario.Model.findById(user_id, '-password').exec(function (err, user) {
-        console.dir(user);
         if(user) {
             res.send(user);
         } else {

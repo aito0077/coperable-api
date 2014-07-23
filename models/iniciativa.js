@@ -52,21 +52,13 @@ var IniciativaSchema = new Schema({
     },
     coords: [Number, Number],
     networks: {
-        facebook: {
-            text: String
-        },
-        twitter: {
-            text: String
-        },
-        vimeo: {
-            text: String
-        },
-        youtube: {
-            text: String
-        },
-        flickr: {
-            text: String
-        }
+        twitter: String,
+        facebook: String,
+        youtube: String,
+        flickr: String,
+        linkedin: String,
+        delicious: String,
+        vimeo: String
     },
     date: { type: Date, default: Date.now },
     start_date: { type: Date, default: Date.now },
@@ -137,6 +129,7 @@ exports.insert = function(iniciativa, success, error) {
     },
     persist = {};
     us.extend(persist, default_values, iniciativa, {coords: [default_values.location.longitude || 0, default_values.location.latitude || 0]});
+
     persist.main_category = us.first(us.filter(us.keys(persist.categories), function(categ) {
         return persist.categories[categ];
     }));
@@ -178,26 +171,49 @@ exports.remove = function(id, success, error) {
 };
 
 exports.update_status = function(success, error) {
-    var today = new Date().setHours(0);
-        tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+    var today = new Date(),
+        tomorrow = new Date();
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    tomorrow.setHours(23);
+    tomorrow.setMinutes(59);
+    tomorrow.setSeconds(59);
 
-    Iniciativa.find({end_date: { $gt: today}, end_date: { $lt: tomorrow}, current_stage: 'PREPARACION'}).exec(function (err, data) {
-        console.dir(data);
-    });
     async.parallel({
         to_active: function(sub_callback) {
             console.log('to_Active');
-            Iniciativa.update({end_date: { $gt: today}, end_date: { $lt: tomorrow}, current_stage: 'PREPARACION'}, {$set: {current_stage: 'ACTIVO'}}, {multi:true}, sub_callback);
+            Iniciativa.update(
+                {
+                    start_date: { $lte: tomorrow },
+                    end_date: { $gte: today },
+                    current_stage: 'PREPARACION'
+                },
+                { $set: { current_stage: 'ACTIVO' } },
+                { multi: true },
+                sub_callback
+            );
         },
         to_finish: function(sub_callback) {
             console.log('to_finish');
-            Iniciativa.update({end_date: { $lt: tomorrow}}, {$set: {current_stage: 'FINALIZADO'}}, {multi:true}, sub_callback);
+            Iniciativa.update(
+                {
+                    end_date: { $lt: today },
+                    current_stage: { $ne: 'FINALIZADO' }
+                },
+                { $set: { current_stage: 'FINALIZADO' } },
+                { multi: true },
+                sub_callback
+            );
         }},
         function(err, results) {
+            console.log(results);
+            if (err) {
+                console.error(err);
+            }
             console.log('end');
-            success();
+            success(results, err);
         }
-
     );
 	
 

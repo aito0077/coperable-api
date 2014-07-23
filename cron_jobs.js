@@ -33,8 +33,10 @@ var mongourl = generate_mongo_url(mongo);
 
 mongoose.connect(mongourl);
 
-iniciativas.update_status(function(success, error) {
-    console.log(error);
+iniciativas.update_status(function(result, error) {
+    if (error) {
+        console.error(error);
+    }
     console.log("FINALIZADO");
     process.exit(code=0);
 });

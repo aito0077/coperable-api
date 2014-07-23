@@ -42,7 +42,7 @@ exports.browseByCategory = function(req, res, next) {
 
 exports.create = function(req, res, next) {
     var body = req.body;
-    console.log("[iniciativa.js create] Craetung new Iniciativa:");
+    console.log("[iniciativa.js create] Creating new Iniciativa:");
     console.dir(body);
     Iniciativa.insert(
         body,
@@ -144,10 +144,11 @@ exports.participate = function(req, res, next) {
 
 exports.findById = function(req, res, next) {
     var iniciativa_id = req.params.id;
-    console.log('Iniciativa id: '+iniciativa_id);
+    console.log('Iniciativa id: '+ iniciativa_id);
     Iniciativa.Model.findById(iniciativa_id).exec(function(err, result) {
-        console.dir(result);
-        console.log(err);
+        if (err) {
+          console.error(err);
+        }
         if(result) {
             res.send(result);
         } else {
@@ -206,5 +207,49 @@ exports.findLast = function(req, res, next) {
 exports.update_status = function(success) {
     Iniciativa.update_status(function(s) {
         success();
+    });
+};
+
+exports.findByIdWithOwnerAndMembers = function(req, res, next) {
+    var iniciativa_id = req.params.id;
+    var number_of_members = parseInt(req.params.number_of_members, 10);
+    if (number_of_members === NaN) {
+        number_of_members = 0;
+    }
+    Iniciativa.Model.findById(iniciativa_id).exec(function onIniciativaFound(err, iniciativa) {
+        result = {};
+        if (err) {
+          console.error(err);
+        }
+        if(iniciativa) {
+            result['iniciativa'] = iniciativa;
+            var userIds = [iniciativa.owner.user];
+            if (iniciativa.members) {
+                for (var i=0, len=iniciativa.members.length; i < len; i++) {
+                    userIds.push(iniciativa.members[i].user);
+                }
+            }
+            usuario.Model.find({
+                '_id': {
+                    "$in": userIds
+                }
+            }).limit(number_of_members + 1).exec(function (err, users) {
+                if (users) {
+                    for (i=0, len=users.length; i < len; i++) {
+                        if (users[i]._id.toString() === iniciativa.owner.user) {
+                            result['owner'] = users[i];
+                            users.splice(i, 1);
+                            break;
+                        }
+                    }
+                    result['members'] = users;
+                }
+                console.dir(result);
+                res.send(result);
+            });
+            
+        } else {
+            res.send(404, {});
+        }
     });
 };
