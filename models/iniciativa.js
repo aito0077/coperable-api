@@ -2,7 +2,8 @@ var mongoose = require('mongoose/'),
     util = require('util'),
     us = require('underscore'),
     async = require("async"),
-    Schema = mongoose.Schema;
+    Schema = mongoose.Schema,
+    Usuario = require('../models/usuario.js');
 
 
 var IniciativaSchema = new Schema({
@@ -28,9 +29,14 @@ var IniciativaSchema = new Schema({
         user: String,
         name: String
     },
+    /**
+     * Participantes de la iniciativa.
+     */
     members: [{
+        /**
+         * Id del usuario.
+         */
         user: String,
-        role: String,
         since_date: { type: Date, default: Date.now }
     }],
     tasks: [{
@@ -95,16 +101,128 @@ exports.list = function(success) {
   });
 };
 
-exports.participate = function(id, success) {
-  Iniciativa.findOne({code: id}).exec(function(err, result) {
-        console.log(err);
-        if(result) {
-            res.send(result);
-        } else {
-            res.send(404, {});
+exports.participate = function(iniciativa, userId, callback) {
+    Iniciativa.update(
+        {
+            _id: iniciativa._id,
+            'members.user': {
+                $ne: userId
+            }
+        },
+        {
+            $push: {
+                'members': {
+                    user: userId
+                }
+            }
+        },
+        {},
+        function updatingIniciativa(errIniciativa, numIniciativaAffected) {
+            if (errIniciativa) {
+                console.error("[updatingIniciativa] Error participando a usuario [" + userId + "] de iniciativa [" + iniciativa._id + "]:");
+                console.dir(errIniciativa);
+                callback(errIniciativa);
+                return;
+            }
+            console.log("[iniciativa::participate] Number of iniciativas updated: " + numIniciativaAffected);
+            if (numIniciativaAffected > 0) {
+                Usuario.Model.update(
+                    {
+                        _id: userId
+                    },
+                    {
+                        $inc: { cantidad_iniciativas: 1 },
+                        $push: {
+                            'iniciativas': {
+                                id: iniciativa._id,
+                                name: iniciativa.name,
+                                description: iniciativa.description,
+                                profile_picture: iniciativa.profile_picture
+                            }
+                        }
+                    },
+                    {},
+                    function updatingUsuario(errUsuario, numUsuarioAffected) {
+                        console.log("[iniciativa::participate] Number of usuarios updated: " + numUsuarioAffected);
+                        if (errUsuario) {
+                            console.error("[updatingUsuario] Error participando a usuario [" + userId + "] de iniciativa [" + iniciativa._id + "]:");
+                            console.dir(errUsuario);
+                            callback(errUsuario);
+                            return;
+                        }
+                        callback(null, {
+                            numIniciativaAffected: numIniciativaAffected,
+                            numUsuarioAffected: numUsuarioAffected
+                        });
+                    }
+                );
+            } else {
+                callback(null, {
+                    numIniciativaAffected: 0,
+                    numUsuarioAffected: 0
+                });
+            }
         }
-});
-}
+    );
+};
+
+exports.quitIniciativa = function(iniciativa, userId, callback) {
+    Iniciativa.update(
+        {
+            _id: iniciativa._id,
+            'members.user': userId
+        },
+        {
+            $pull: {
+                'members': {
+                    user: userId
+                }
+            }
+        },
+        {},
+        function updatingIniciativa(errIniciativa, numIniciativaAffected) {
+            if (errIniciativa) {
+                console.error("[updatingIniciativa] Error removiendo a usuario [" + userId + "] de iniciativa [" + iniciativa._id + "]:");
+                console.dir(errIniciativa);
+                callback(errIniciativa);
+                return;
+            }
+            if (numIniciativaAffected > 0) {
+                Usuario.Model.update(
+                    {
+                        _id: userId
+                    },
+                    {
+                        $inc: { cantidad_iniciativas: -1 },
+                        $pull: {
+                            'iniciativas': {
+                                id: iniciativa._id
+                            }
+                        }
+                    }, {},
+                    function updatingUsuario(errUsuario, numUsuarioAffected) {
+                        if (errUsuario) {
+                            console.error("[updatingUsuario] Error removiendo a usuario [" + userId + "] de iniciativa [" + iniciativa._id + "]:");
+                            console.dir(errUsuario);
+                            callback(errUsuario);
+                            return;
+                        }
+                        callback(null, {
+                            numIniciativaAffected: numIniciativaAffected,
+                            numUsuarioAffected: numUsuarioAffected
+                        });
+                    }
+                );
+            } else {
+                callback(null, {
+                    numIniciativaAffected: 0,
+                    numUsuarioAffected: 0
+                });
+            }
+        }
+    );
+};
+
 
 
 exports.get = function(id, success) {

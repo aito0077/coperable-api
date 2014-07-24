@@ -19,13 +19,29 @@ var UsuarioSchema = new Schema({
     picture_thumb: String,
     about: String,
     cantidad_iniciativas:  {type: Number, default: 0},
+    /**
+     * Iniciativa a las que se anotó.
+     */
     iniciativas:    [{
-        title: String,
+        id: String,
+        name: String,
         description: String,
         profile_picture: String,
-        owner: { type: Boolean, default: false}
+    }],
+    /**
+     * Iniciativa que el usuario creó.
+     */
+    ownedIniciativas:    [{
+        id: String,
+        name: String,
+        description: String,
+        profile_picture: String,
     }],
     cantidad_actividades:  {type: Number, default: 0},
+    /**
+     * Not being used, it will store a list of all the activities of the user.
+     * For example: 'crea iniciativa', 'participo iniciativa', 'comento en iniciativa', etc.
+     */
     activities: [{
         date: { type: Date, default: Date.now },
         description: { type: Date, default: Date.now },

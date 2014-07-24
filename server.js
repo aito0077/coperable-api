@@ -53,6 +53,7 @@ server.get('/api/iniciativa/withOwnerAndMembers/:number_of_members/:id', iniciat
 server.post('/api/iniciativa', iniciativas.create);
 server.put('/api/iniciativa/:id', iniciativas.save);
 server.post('/api/iniciativa/:id/:userId', iniciativas.participate);
+server.post('/api/iniciativa/:id/:userId/quit', iniciativas.quitIniciativa);
 
 server.get('/api/organizadores', usuarios.listOwners);
 server.get('/api/participantes', usuarios.list);

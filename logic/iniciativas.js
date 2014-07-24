@@ -1,5 +1,5 @@
 var Iniciativa = require('../models/iniciativa.js'),
-    usuario = require('../models/usuario.js'),
+    Usuario = require('../models/usuario.js'),
     us = require('underscore');
 
 exports.list = function(req, res, next) {
@@ -47,16 +47,16 @@ exports.create = function(req, res, next) {
     Iniciativa.insert(
         body,
         function(data) {
-            usuario.Model.findById(body.owner.user).exec(function (err, user) {
+            Usuario.Model.findById(body.owner.user).exec(function (err, user) {
                 if(user) {
                     user.update({ 
                             $inc: {
                                 'cantidad_iniciativas':1
                             },
                             $push: {
-                                'iniciativas': {
+                                'ownedIniciativas': {
                                     id: data._id,
-                                    title: body.title,
+                                    name: body.name,
                                     description: body.description,
                                     picture: body.profile_picture,
                                     owner: true
@@ -93,54 +93,63 @@ exports.save = function(req, res, next) {
 }
 
 exports.participate = function(req, res, next) {
-    var body = req.body;
-    Iniciativa.participate(
-        body,
-        function(data) {
-            usuario.Model.findById(body.owner.user).exec(function (err, user) {
-                user.update({ 
-                        $inc: {
-                            'cantidad_iniciativas':1
-                        },
-                        $push: {
-                            'iniciativas': {
-                                id: data._id,
-                                title: body.title,
-                                description: body.description,
-                                owner: true
-                            }
-                        }   
-                    },
-                    function() {
-                        res.send(data);
-                    } 
-                );
-            });
-
-        },
-        function(err) {
-            res.send({error: err});
+    var iniciativaId = req.params.id,
+        userId = req.params.userId;
+    console.log("[iniciativa.js::participate] About to add member [%s] to iniciativa [%s]", userId, iniciativaId);
+    Iniciativa.Model.findById(iniciativaId, function (err, iniciativa) {
+        if (err) {
+            console.error("[iniciativa.js::participate] Error in participate, findById [%s]", iniciativaId);
+            console.error(err);
+            res.send(err)
         }
-    );
-};
-
-/*
-exports.participate = function(req, res, next) {
-    console.log('Guardando iniciativa');
-    var iniciativa_id = req.params.id;
-    var user_id = req.params.userId;
-    var body = req.body;
-    var user = 
-    Iniciativa.Model.findById(iniciativa_id, function (err, iniciativa) {
-        if (err) return handleError(err);
-        us.extend(iniciativa, body);
-        iniciativa.save(function (err) {
-        if (err) return handleError(err);
-            res.send(iniciativa);
+        if (!iniciativa) {
+            console.log("[iniciativa.js::participate] Iniciativa not found!: " + iniciativaId);
+            return res.send("Iniciativa not found.");
+        }
+        if (iniciativa.owner.user === userId) {
+            console.log("[iniciativa.js::participate] El Owner de la iniciativa no puede ser agregado como miembre de la misma");
+            res.send({
+                numUsuarioAffected: 0,
+                numIniciativaAffected: 0
+            });
+        }
+        Iniciativa.participate(iniciativa, userId, function(err, data) {
+            if (err) {
+                console.error("[iniciativa.js::participate] Error in participate, Iniciativa.participate [%s]", iniciativaId);
+                console.error(err);
+                res.send(err)
+            }
+            console.log("[iniciativa.js::participate] [%d] Usuarios agregados a [%d] iniciativas", data.numUsuarioAffected, data.numIniciativaAffected);
+            res.send(data)
         });
     });
-}
-*/
+};
+
+exports.quitIniciativa = function(req, res, next) {
+    var iniciativaId = req.params.id,
+        userId = req.params.userId;
+    console.log("[iniciativa.js::quitIniciativa] About to quit member [%s] from iniciativa [%s]", userId, iniciativaId);
+    Iniciativa.Model.findById(iniciativaId, function (err, iniciativa) {
+        if (err) {
+            console.error("[iniciativa.js::quitIniciativa] Error in quitIniciativa, findById [%s]", iniciativaId);
+            console.error(err);
+            res.send(err)
+        }
+        if (!iniciativa) {
+            console.log("[iniciativa.js::quitIniciativa] Iniciativa not found!: " + iniciativaId);
+            return res.send("Iniciativa not found.");
+        }
+        Iniciativa.quitIniciativa(iniciativa, userId, function(err, data) {
+            if (err) {
+                console.error("[iniciativa.js::quitIniciativa] Error in quitIniciativa, Iniciativa.participate [%s]", iniciativaId);
+                console.error(err);
+                res.send(err)
+            }
+            console.log("[iniciativa.js::quitIniciativa] [%d] Usuarios removido a [%d] iniciativa", data.numUsuarioAffected, data.numIniciativaAffected);
+            res.send(data)
+        });
+    });
+};
 
 exports.findById = function(req, res, next) {
     var iniciativa_id = req.params.id;
@@ -229,7 +238,7 @@ exports.findByIdWithOwnerAndMembers = function(req, res, next) {
                     userIds.push(iniciativa.members[i].user);
                 }
             }
-            usuario.Model.find({
+            Usuario.Model.find({
                 '_id': {
                     "$in": userIds
                 }
@@ -244,7 +253,6 @@ exports.findByIdWithOwnerAndMembers = function(req, res, next) {
                     }
                     result['members'] = users;
                 }
-                console.dir(result);
                 res.send(result);
             });
             
