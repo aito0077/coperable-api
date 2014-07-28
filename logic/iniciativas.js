@@ -42,6 +42,14 @@ exports.browseByCategory = function(req, res, next) {
 
 exports.create = function(req, res, next) {
     var body = req.body;
+    if (body.start_date_timestamp) {
+        body.start_date = new Date(body.start_date_timestamp);
+        delete body.start_date_timestamp;
+    }
+    if (body.end_date_timestamp) {
+        body.end_date = new Date(body.end_date_timestamp);
+        delete body.end_date_timestamp;
+    }
     console.log("[iniciativa.js create] Creating new Iniciativa:");
     console.dir(body);
     Iniciativa.insert(
@@ -79,9 +87,17 @@ exports.create = function(req, res, next) {
 
 
 exports.save = function(req, res, next) {
-    console.log('Guardando iniciativa');
     var iniciativa_id = req.params.id;
+    console.log('[iniciativas::save] Guardando iniciativa: ' + iniciativa_id);
     var body = req.body;
+    if (body.start_date_timestamp) {
+        body.start_date = new Date(body.start_date_timestamp);
+        delete body.start_date_timestamp;
+    }
+    if (body.end_date_timestamp) {
+        body.end_date = new Date(body.end_date_timestamp);
+        delete body.end_date_timestamp;
+    }
     Iniciativa.Model.findById(iniciativa_id, function (err, iniciativa) {
         if (err) return handleError(err);
         us.extend(iniciativa, body);

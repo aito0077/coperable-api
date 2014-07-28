@@ -51,7 +51,7 @@ server.get('/api/iniciativa/s_name/:name', iniciativas.findByName);
 server.get('/api/iniciativa/:id', iniciativas.findById);
 server.get('/api/iniciativa/withOwnerAndMembers/:number_of_members/:id', iniciativas.findByIdWithOwnerAndMembers);
 server.post('/api/iniciativa', iniciativas.create);
-server.put('/api/iniciativa/:id', iniciativas.save);
+server.post('/api/iniciativa/:id', iniciativas.save);
 server.post('/api/iniciativa/:id/:userId', iniciativas.participate);
 server.post('/api/iniciativa/:id/:userId/quit', iniciativas.quitIniciativa);
 
