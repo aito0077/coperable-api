@@ -66,8 +66,7 @@ exports.create = function(req, res, next) {
                                     id: data._id,
                                     name: body.name,
                                     description: body.description,
-                                    profile_picture: body.profile_picture,
-                                    owner: true
+                                    profile_picture: body.profile_picture
                                 }
                             }   
                         },
@@ -244,7 +243,8 @@ exports.findByIdWithOwnerAndMembers = function(req, res, next) {
     Iniciativa.Model.findById(iniciativa_id).exec(function onIniciativaFound(err, iniciativa) {
         result = {};
         if (err) {
-          console.error(err);
+          console.error("[iniciativa::findByIdWithOwnerAndMembers] Thera has been an error fetching iniciativa ["
+              + iniciativa + "]: " + err);
         }
         if(iniciativa) {
             result['iniciativa'] = iniciativa;
