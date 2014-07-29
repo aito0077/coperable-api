@@ -66,7 +66,7 @@ exports.create = function(req, res, next) {
                                     id: data._id,
                                     name: body.name,
                                     description: body.description,
-                                    picture: body.profile_picture,
+                                    profile_picture: body.profile_picture,
                                     owner: true
                                 }
                             }   
