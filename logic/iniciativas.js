@@ -58,9 +58,6 @@ exports.create = function(req, res, next) {
             Usuario.Model.findById(body.owner.user).exec(function (err, user) {
                 if(user) {
                     user.update({ 
-                            $inc: {
-                                'cantidad_iniciativas':1
-                            },
                             $push: {
                                 'ownedIniciativas': {
                                     id: data._id,

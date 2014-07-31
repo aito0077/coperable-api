@@ -18,7 +18,6 @@ var UsuarioSchema = new Schema({
     picture: String,
     picture_thumb: String,
     about: String,
-    cantidad_iniciativas:  {type: Number, default: 0},
     /**
      * Iniciativa a las que se anotó.
      */

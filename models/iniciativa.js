@@ -56,6 +56,9 @@ var IniciativaSchema = new Schema({
         latitude: {type: Number, default: 0},
         longitude: {type: Number, default: 0}
     },
+    /**
+     * Campo duplicado de location. está duplicado xq se usa para ser indexado cómo '2d'.
+     */
     coords: [Number, Number],
     networks: {
         twitter: String,
@@ -131,7 +134,6 @@ exports.participate = function(iniciativa, userId, callback) {
                         _id: userId
                     },
                     {
-                        $inc: { cantidad_iniciativas: 1 },
                         $push: {
                             'iniciativas': {
                                 id: iniciativa._id,
@@ -193,7 +195,6 @@ exports.quitIniciativa = function(iniciativa, userId, callback) {
                         _id: userId
                     },
                     {
-                        $inc: { cantidad_iniciativas: -1 },
                         $pull: {
                             'iniciativas': {
                                 id: iniciativa._id
