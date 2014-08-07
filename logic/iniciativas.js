@@ -1,7 +1,8 @@
 var Iniciativa = require('../models/iniciativa.js'),
     Usuario = require('../models/usuario.js'),
     nodemailer = require('nodemailer'),
-    us = require('underscore');
+    Topic = require('../models/topic.js'),
+    _ = require('underscore');
 
 exports.list = function(req, res, next) {
     Iniciativa.list(
@@ -41,6 +42,21 @@ exports.browseByCategory = function(req, res, next) {
 
 };
 
+var updateTopicsList = function (iniciativa, done) {
+    console.log("---------------------------------");
+    if (iniciativa.topics) {
+        var topic_models = [];
+        _.each(iniciativa.topics, function(topic) {
+            Topic.update(topic, iniciativa._id, function(data) {
+                topic_models.push(data);
+                if (topic_models.length === iniciativa.topics.length) {
+                    done(topic_models);
+                }
+            });
+        });
+    }
+};
+
 exports.create = function(req, res, next) {
     var body = req.body;
     if (body.start_date_timestamp) {
@@ -69,8 +85,10 @@ exports.create = function(req, res, next) {
                             }   
                         },
                         function() {
-                           send_mail_created(user, data);
-                           res.send(data);
+                            updateTopicsList(data, function(topic_models) {
+                                send_mail_created(user, data);
+                                res.send(data);
+                            });
                         } 
                     );
                 }
@@ -99,10 +117,12 @@ exports.save = function(req, res, next) {
     }
     Iniciativa.Model.findById(iniciativa_id, function (err, iniciativa) {
         if (err) return handleError(err);
-        us.extend(iniciativa, body);
+        _.extend(iniciativa, body);
         iniciativa.save(function (err) {
-        if (err) return handleError(err);
-            res.send(iniciativa);
+            if (err) return handleError(err);
+            updateTopicsList(data, function(iniciativa) {
+                res.send(iniciativa);
+            });
         });
     });
 }
