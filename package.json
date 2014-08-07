@@ -12,6 +12,10 @@
     "mongoose": "*",
     "bcrypt": "0.7.5",
     "async": "*",
+    "nodemailer": "0.7",
+    "nodemailer-smtp-transport": "*",
+    "nodemailer-direct-transport": "*",
+     "email-templates": "0.0.5",
     "validator": "1.1.1"
   }
 }

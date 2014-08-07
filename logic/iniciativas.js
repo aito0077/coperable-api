@@ -1,5 +1,6 @@
 var Iniciativa = require('../models/iniciativa.js'),
     Usuario = require('../models/usuario.js'),
+    nodemailer = require('nodemailer'),
     us = require('underscore');
 
 exports.list = function(req, res, next) {
@@ -68,7 +69,8 @@ exports.create = function(req, res, next) {
                             }   
                         },
                         function() {
-                            res.send(data);
+                           send_mail_created(user, data);
+                           res.send(data);
                         } 
                     );
                 }
@@ -76,6 +78,7 @@ exports.create = function(req, res, next) {
 
         },
         function(err) {
+            console.log(err);
             res.send({error: err});
         }
     );
@@ -274,3 +277,22 @@ exports.findByIdWithOwnerAndMembers = function(req, res, next) {
         }
     });
 };
+
+send_mail_created = function(owner, iniciativa) {
+       var transporter = nodemailer.createTransport();
+       var data_to_send = {
+           from: 'info@coperable.com.ar',
+           to: owner.email,
+           subject: 'Iniciativa Creada',
+           text: 'Estos son los datos de la iniciativa: '+iniciativa.name+' link: http://coperable.com.ar/iniciativas/'+iniciativa._id
+       };
+    console.dir(transporter);
+       transporter.sendMail(data_to_send, function(err, info) {
+
+        console.log("Error sending? "+err);
+        console.dir(info);
+        console.log("Inicaitvia enviada");
+       });
+};
+    
+
