@@ -29,16 +29,29 @@ exports.browseByUser = function(req, res, next) {
 };
 
 exports.browseByCategory = function(req, res, next) {
-    var category = req.params.category; 
+    var category = req.params.category, 
+        yesterday = new Date();
 
     console.log('Buscando por categoria: '+category);
-    Iniciativa.Model.find().where('profile_picture').exists(true).where('categories.'+category).equals(true).exec(
-    //Iniciativa.Model.find('{categories.'+category+': true, profile_picture:{$exists:true}}').equals(true).exec(
-        function (err, iniciativas) {
-            if (err) return handleError(err);
-            res.send(iniciativas);
-        }
-    );
+    if(category == 'all') {
+        Iniciativa.Model.find({
+            end_date: { $gt: yesterday }
+        }).where('profile_picture').exists(true).exec(
+            function (err, iniciativas) {
+                if (err) return handleError(err);
+                res.send(iniciativas);
+            }
+        );
+    } else {
+        Iniciativa.Model.find({
+            end_date: { $gt: yesterday }
+        }).where('profile_picture').exists(true).where('categories.'+category).equals(true).exec(
+            function (err, iniciativas) {
+                if (err) return handleError(err);
+                res.send(iniciativas);
+            }
+        );
+    }
 
 };
 
@@ -86,7 +99,9 @@ exports.create = function(req, res, next) {
                         },
                         function() {
                             updateTopicsList(data, function(topic_models) {
-                                send_mail_created(user, data);
+                                if(user.email) {
+                                    send_mail_created(user, data);
+                                }
                                 res.send(data);
                             });
                         } 
