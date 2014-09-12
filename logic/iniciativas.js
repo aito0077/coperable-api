@@ -71,6 +71,7 @@ var updateTopicsList = function (iniciativa, done) {
 };
 
 exports.create = function(req, res, next) {
+    console.log("[previous create]:");
     var body = req.body;
     if (body.start_date_timestamp) {
         body.start_date = new Date(body.start_date_timestamp);
@@ -86,6 +87,7 @@ exports.create = function(req, res, next) {
         body,
         function(data) {
             Usuario.Model.findById(body.owner.user).exec(function (err, user) {
+		console.log(err);
                 if(user) {
                     user.update({ 
                             $push: {

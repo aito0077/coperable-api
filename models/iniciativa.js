@@ -237,11 +237,18 @@ exports.insert = function(iniciativa, success, error) {
         creation_date: new Date(),
         modification_date: new Date(),
         coords: [iniciativa.location.longitude || 0, iniciativa.location.latitude || 0],
+	categories: {
+		medio_ambiente: false,
+		educacion: false,
+		desarrollo: false,
+		arte_cultura: false
+	},
         location: {
             latitude: iniciativa.location.latitude,
             longitude: iniciativa.location.longitude
         },
         current_stage: 'PREPARACION',
+        feca: false,
         stages: [{
             stage: 'PREPARACION',
             description: 'PREPARACION',
