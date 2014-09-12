@@ -45,6 +45,7 @@ var IniciativaSchema = new Schema({
     }],
     topics: [String],
     public: { type: Boolean, default: false},
+    feca: { type: Boolean, default: false},
     stages: [{
         stage: String,
         description: String,

@@ -60,6 +60,7 @@ server.get('/api/participantes', usuarios.list);
 
 server.post('/api/user/authenticate', usuarios.authenticate);
 server.get('/api/user/:id', usuarios.findById);
+server.post('/api/user/:id', usuarios.update);
 server.get('/api/user/oauth/:provider/:id', usuarios.findByProvider);
 
 server.put('/api/usuario', usuarios.create);

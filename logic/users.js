@@ -86,6 +86,19 @@ exports.findById = function(req, res, next) {
     });
 };
 
+exports.update = function(req, res, next) {
+    var user_id = req.params.id;
+    usuario.Model.findById(user_id, '-password').exec(function (err, user) {
+        if(user) {
+            res.send(user);
+        } else {
+            res.send(404, 'usuario_password_erroneo');
+        }
+    });
+};
+
+
+
 exports.findByProvider = function(req, res, next) {
     var provider = req.params.provider;
         user_id = req.params.id,
