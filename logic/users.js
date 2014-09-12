@@ -60,13 +60,19 @@ exports.authenticate = function(req, res, next) {
             throw err;
         }
         if(user) {
-            user.comparePassword(login_data.password, function(err, isMatch) {
-                if (err) { 
-		    console.log('error de password');
-                    throw err;
-                }
-                res.send(isMatch ? user : {});
-            });
+            if(user['feca'] == true) {
+                console.log("No Feca ");
+                user.comparePassword(login_data.password, function(err, isMatch) {
+                    if (err) { 
+                console.log('error de password');
+                        throw err;
+                    }
+                    res.send(isMatch ? user : {});
+                });
+            } else {
+                console.log("Feca Password: "+login_data.password+" - user: "+user.password);
+                res.send((login_data.password == user.password) ? user : {});
+            }
         } else {
             res.send({});
         }
