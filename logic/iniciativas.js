@@ -218,6 +218,22 @@ exports.findById = function(req, res, next) {
     });
 };
 
+exports.findByQuery = function(req, res, next) {
+    var query= req.body;
+    console.log("Find by query");
+    Iniciativa.Model.find(query).exec(function(err, result) {
+        console.dir(result);
+        console.log(err);
+        if(result) {
+            res.send(result);
+        } else {
+            res.send(404, {});
+        }
+    });
+};
+
+
+
 exports.findByName = function(req, res, next) {
     var slug = req.params.name;
     console.log('Iniciativa Slug: '+slug);
