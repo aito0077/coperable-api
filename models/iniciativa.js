@@ -18,6 +18,7 @@ var IniciativaSchema = new Schema({
     participants_amount:   String,
     phone:   String,
     email:   String,
+    entrada:   String,
     main_category: String,
     categories: {
         medio_ambiente: {type: Boolean, default: false},
