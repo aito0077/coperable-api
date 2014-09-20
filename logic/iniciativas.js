@@ -218,6 +218,35 @@ exports.findById = function(req, res, next) {
     });
 };
 
+exports.getTags = function(req, res, next) {
+    var query= req.body;
+    console.log("Find by query");
+    var results = {};
+    Iniciativa.Model.distinct('topics',query).populate('topics').exec(function (err, topics) { 
+        results['topics']  = topics || [];
+        console.dir(topics);
+
+        Iniciativa.Model.distinct('tasks',query).populate('tasks').exec(function (err, tasks) { 
+            console.dir(tasks);
+            results['tasks']  = [];
+            if(tasks) {
+                _.each(tasks, function(model) {
+                    results['tasks'].push(model.tag);
+                } );
+            }
+
+            res.send(results);
+        });
+
+
+    });
+
+
+};
+
+
+
+
 exports.findByQuery = function(req, res, next) {
     var query= req.body;
     console.log("Find by query");

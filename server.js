@@ -56,6 +56,8 @@ server.post('/api/iniciativa/:id', iniciativas.save);
 server.post('/api/iniciativa/:id/:userId', iniciativas.participate);
 server.post('/api/iniciativa/:id/:userId/quit', iniciativas.quitIniciativa);
 
+server.post('/api/tags', iniciativas.getTags);
+
 server.get('/api/organizadores', usuarios.listOwners);
 server.get('/api/participantes', usuarios.list);
 
