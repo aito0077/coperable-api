@@ -250,7 +250,7 @@ exports.getTags = function(req, res, next) {
 exports.findByQuery = function(req, res, next) {
     var query= req.body;
     console.log("Find by query");
-    Iniciativa.Model.find(query).exec(function(err, result) {
+    Iniciativa.Model.find(query).sort('-start_date').exec(function(err, result) {
         console.dir(result);
         console.log(err);
         if(result) {
