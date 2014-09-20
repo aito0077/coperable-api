@@ -226,12 +226,12 @@ exports.getTags = function(req, res, next) {
         results['topics']  = topics || [];
         console.dir(topics);
 
-        Iniciativa.Model.distinct('tasks',query).populate('tasks').exec(function (err, tasks) { 
+        Iniciativa.Model.distinct('tasks.tag',query).populate('tasks').exec(function (err, tasks) { 
             console.dir(tasks);
             results['tasks']  = [];
             if(tasks) {
                 _.each(tasks, function(model) {
-                    results['tasks'].push(model.tag);
+                    results['tasks'].push(model);
                 } );
             }
 
@@ -250,7 +250,7 @@ exports.getTags = function(req, res, next) {
 exports.findByQuery = function(req, res, next) {
     var query= req.body;
     console.log("Find by query");
-    Iniciativa.Model.find(query).sort('-start_date').exec(function(err, result) {
+    Iniciativa.Model.find(query).sort('start_date').exec(function(err, result) {
         console.dir(result);
         console.log(err);
         if(result) {
