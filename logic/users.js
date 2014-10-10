@@ -60,7 +60,7 @@ exports.authenticate = function(req, res, next) {
             throw err;
         }
         if(user) {
-            if(user['feca'] == true) {
+            if(user['feca'] != true) {
                 console.log("No Feca ");
                 user.comparePassword(login_data.password, function(err, isMatch) {
                     if (err) { 
