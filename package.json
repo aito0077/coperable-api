@@ -15,7 +15,9 @@
     "nodemailer": "0.7",
     "nodemailer-smtp-transport": "*",
     "nodemailer-direct-transport": "*",
-     "email-templates": "0.0.5",
-    "validator": "1.1.1"
+    "email-templates": "0.0.5",
+    "validator": "1.1.1",
+    "mongoosastic": "*",
+    "elasticsearch": "2.4.3"
   }
 }

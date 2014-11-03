@@ -1,4 +1,5 @@
 var mongoose = require('mongoose/'),
+    mongoosastic = require('mongoosastic'),
     us = require('underscore'),
     Schema = mongoose.Schema,
     bcrypt = require('bcrypt'),
@@ -16,7 +17,7 @@ var UsuarioSchema = new Schema({
     authenticate_with: String,
     birthdate: Date,
     picture: String,
-    picture_thumb: String,
+    profile_picture: String,
     about: String,
     /**
      * Iniciativa a las que se anotó.
@@ -108,6 +109,9 @@ UsuarioSchema.methods.comparePassword = function(candidatePassword, callback) {
         callback(null, isMatch);
     });
 };
+
+UsuarioSchema.plugin(mongoosastic);
+
 
 var Usuario = mongoose.model('Usuario', UsuarioSchema);
 

@@ -2,6 +2,10 @@ var Iniciativa = require('../models/iniciativa.js'),
     Usuario = require('../models/usuario.js'),
     nodemailer = require('nodemailer'),
     Topic = require('../models/topic.js'),
+    es = require('elasticsearch'),
+    client = new es.Client({
+        host: 'localhost:9200'
+    }),
     _ = require('underscore');
 
 exports.list = function(req, res, next) {
@@ -13,6 +17,46 @@ exports.list = function(req, res, next) {
             res.send(err);
         }
     );
+};
+
+
+exports.search = function(req, res, next) {
+    console.log(req.params.q);
+    Iniciativa.Model.search({
+        query: req.params.q
+    }, function(error, results) {
+        res.send(results);
+    });
+};
+
+exports.aggregations = function(req, res, next) {
+    client.search({
+        index: 'iniciativas',
+        search_type: 'count',
+        body: {
+            aggs: {
+                histogram: {
+                    date_histogram: {
+                        field: 'start_date',
+                        interval: 'month',
+                        min_doc_count: 1
+                    }
+                },
+                main_categories: {
+                    terms: {
+                        field: 'main_category'
+                    }
+                },
+                topics: {
+                    terms: {
+                        field: 'topics'
+                    }
+                }
+            }
+        }
+    }, function(error, response) {
+        res.send(response);
+    });
 };
 
 exports.browseByUser = function(req, res, next) {
@@ -87,7 +131,7 @@ exports.create = function(req, res, next) {
         body,
         function(data) {
             Usuario.Model.findById(body.owner.user).exec(function (err, user) {
-		console.log(err);
+                console.log(err);
                 if(user) {
                     user.update({ 
                             $push: {
@@ -220,14 +264,11 @@ exports.findById = function(req, res, next) {
 
 exports.getTags = function(req, res, next) {
     var query= req.body;
-    console.log("Find by query");
     var results = {};
     Iniciativa.Model.distinct('topics',query).populate('topics').exec(function (err, topics) { 
         results['topics']  = topics || [];
-        console.dir(topics);
 
         Iniciativa.Model.distinct('tasks.tag',query).populate('tasks').exec(function (err, tasks) { 
-            console.dir(tasks);
             results['tasks']  = [];
             if(tasks) {
                 _.each(tasks, function(model) {
@@ -285,8 +326,11 @@ exports.findLast = function(req, res, next) {
     console.dir(req.params);
     var lat = req.params.lat,
         lng = req.params.lng,
+        limit = req.query.limit || 30,
         yesterday = new Date();
+        console.dir(req.query);
     yesterday.setDate(yesterday.getDate() - 1);
+    console.log("[iniciativa.js findLast] Limite: " + limit);
 
     Iniciativa.Model.find(
         {
@@ -296,7 +340,7 @@ exports.findLast = function(req, res, next) {
                 $near : [lng, lat],
                 $maxDistance : 500/111.2
             }
-        }).where('profile_picture').exists(true).sort('-start_date')
+        }).where('profile_picture').exists(true).sort('-start_date').limit(limit)
         .exec(function(err, result) {
             if(result) {
                 console.log("[iniciativa.js findLast] Resultados: " + result.length);

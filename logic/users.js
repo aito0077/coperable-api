@@ -29,6 +29,7 @@ exports.create = function(req, res, next) {
     var body = req.body;
     console.log("[users.js create] Creating new user: ");
     console.dir(body);
+    body['picture'] = body.profile_picture;
     usuario.alreadyExists(body.username, function(results) {
         console.log("[users.js create] Inserting new user;")
         usuario.insert(
@@ -103,6 +104,21 @@ exports.update = function(req, res, next) {
     });
 };
 
+exports.save = function(req, res, next) {
+    var user_id = req.params.id;
+    console.log('[usuarios::save] Guardando usuario: ' + user_id);
+    var body = req.body;
+
+    body['picture'] = body.profile_picture;
+    usuario.Model.findById(user_id, function (err, user) {
+        if (err) return handleError(err);
+        us.extend(user, body);
+        user.save(function (err) {
+            if (err) return handleError(err);
+            res.send(user);
+        });
+    });
+};
 
 
 exports.findByProvider = function(req, res, next) {

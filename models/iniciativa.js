@@ -1,4 +1,5 @@
-var mongoose = require('mongoose/'),
+var mongoose = require('mongoose'),
+    mongoosastic = require('mongoosastic'),
     util = require('util'),
     us = require('underscore'),
     async = require("async"),
@@ -30,6 +31,12 @@ var IniciativaSchema = new Schema({
         user: String,
         name: String
     },
+    comunidades: [{
+        _id: String,
+        name: String,
+        since: { type: Date, default: Date.now }
+    }],
+
     /**
      * Participantes de la iniciativa.
      */
@@ -50,8 +57,8 @@ var IniciativaSchema = new Schema({
     stages: [{
         stage: String,
         description: String,
-        start_date: { type: Date, default: Date.now },
-        finish_date: { type: Date, default: Date.now }
+        start_date: { type: Date, default: Date.now, es_type:'date'},
+        finish_date: { type: Date, default: Date.now, es_type:'date'}
     }],
     current_stage: String,
     version: Number,
@@ -72,11 +79,11 @@ var IniciativaSchema = new Schema({
         delicious: String,
         vimeo: String
     },
-    date: { type: Date, default: Date.now },
-    start_date: { type: Date, default: Date.now },
-    end_date: { type: Date, default: Date.now },
-    creation_date: { type: Date, default: Date.now },
-    modification_date: { type: Date, default: Date.now }
+    date: { type: Date, default: Date.now, es_type:'date' },
+    start_date: { type: Date, default: Date.now, es_type:'date' },
+    end_date: { type: Date, default: Date.now, es_type:'date' },
+    creation_date: { type: Date, default: Date.now, es_type:'date' },
+    modification_date: { type: Date, default: Date.now, es_type:'date' }
 });
 
 IniciativaSchema.virtual('convocatoria').get(function () {
@@ -94,6 +101,8 @@ IniciativaSchema.virtual('finalizada').get(function () {
 IniciativaSchema.index ({
        coords : "2d"
 });
+
+IniciativaSchema.plugin(mongoosastic);
 
 var Iniciativa = mongoose.model('Iniciativa', IniciativaSchema);
 
@@ -238,12 +247,12 @@ exports.insert = function(iniciativa, success, error) {
         creation_date: new Date(),
         modification_date: new Date(),
         coords: [iniciativa.location.longitude || 0, iniciativa.location.latitude || 0],
-	categories: {
-		medio_ambiente: false,
-		educacion: false,
-		desarrollo: false,
-		arte_cultura: false
-	},
+        categories: {
+            medio_ambiente: false,
+            educacion: false,
+            desarrollo: false,
+            arte_cultura: false
+        },
         location: {
             latitude: iniciativa.location.latitude,
             longitude: iniciativa.location.longitude
