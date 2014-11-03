@@ -39,7 +39,8 @@ exports.aggregations = function(req, res, next) {
                     date_histogram: {
                         field: 'start_date',
                         interval: 'month',
-                        min_doc_count: 1
+                        min_doc_count: 1,
+                        format: 'M'
                     }
                 },
                 main_categories: {
@@ -51,7 +52,13 @@ exports.aggregations = function(req, res, next) {
                     terms: {
                         field: 'topics'
                     }
+                },
+                comunidades: {
+                    terms: {
+                        field: 'comunidades.name'
+                    }
                 }
+ 
             }
         }
     }, function(error, response) {
