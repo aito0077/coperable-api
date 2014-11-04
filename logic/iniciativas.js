@@ -23,7 +23,9 @@ exports.list = function(req, res, next) {
 exports.search = function(req, res, next) {
     console.log(req.params.q);
     Iniciativa.Model.search({
-        query: req.params.q
+	query_string: {
+		query: req.params.q
+	}
     }, function(error, results) {
         res.send(results);
     });
