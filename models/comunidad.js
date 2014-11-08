@@ -17,15 +17,12 @@ var ComunidadSchema = new Schema({
         user: String,
         since_date: { type: Date, default: Date.now }
     }],
-    members: [{
-        user: String,
-        since_date: { type: Date, default: Date.now }
-    }],
+    members: [],
     participants: [{
         user: String,
         since_date: { type: Date, default: Date.now }
     }],
-    iniciativas: [String],
+    iniciativas: [], 
     iniciativas_amount: {type: Number, default: 0},
     topics: [String],
     public: { type: Boolean, default: false},
@@ -88,6 +85,7 @@ exports.update = function(comunidad, success, error) {
         }
     });
 };
+
 
 exports.remove = function(id, success, error) {
 

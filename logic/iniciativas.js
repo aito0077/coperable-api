@@ -1,5 +1,6 @@
 var Iniciativa = require('../models/iniciativa.js'),
     Usuario = require('../models/usuario.js'),
+    comunidades = require('../logic/comunidades.js'),
     nodemailer = require('nodemailer'),
     Topic = require('../models/topic.js'),
     es = require('elasticsearch'),
@@ -153,16 +154,23 @@ exports.create = function(req, res, next) {
                             }   
                         },
                         function() {
-                            updateTopicsList(data, function(topic_models) {
-                                if(user.email) {
-                                    send_mail_created(user, data);
-                                }
-                                res.send(data);
-                            });
+                            try {
+                                updateTopicsList(data, function(topic_models) {
+                                    if(user.email) {
+                                        send_mail_created(user, data);
+                                    }
+                                    res.send(data);
+                                });
+                            } catch(error) {
+                                console.log("Error en evio de mail: "+error);
+                            }
+                            comunidades.add_iniciativa_to_comunidades(data);
                         } 
                     );
                 }
             });
+
+            
 
         },
         function(err) {
@@ -412,6 +420,28 @@ exports.findByIdWithOwnerAndMembers = function(req, res, next) {
         }
     });
 };
+
+exports.get_by_comunidad = function(comunidad_id, next) {
+    Iniciativa.Model.find({
+        end_date: { $gt: yesterday }
+    }).where('profile_picture').exists(true).where('categories.'+category).equals(true).exec(
+        function (err, iniciativas) {
+            if (err) return handleError(err);
+            res.send(iniciativas);
+        }
+    );
+ 
+    Iniciativa.list(
+        function(data) {
+            res.send(data);
+        },
+        function(err) {
+            res.send(err);
+        }
+    );
+};
+
+
 
 send_mail_created = function(owner, iniciativa) {
        var transporter = nodemailer.createTransport();
