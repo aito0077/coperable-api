@@ -20,6 +20,50 @@ exports.list = function(req, res, next) {
     );
 };
 
+exports.search_by_term = function(req, res, next) {
+    var term = req.params.term,
+        value = req.params.value,
+        term_object= {};
+
+    if(value == 1) {
+        client.search({
+            index: 'iniciativas',
+            body: {
+                "query" : {
+                    "filtered" : { 
+                        "query" : {
+                            "match_all" : {} 
+                        }
+                    }
+                }
+            }
+        }, function(error, response) {
+            res.send(response);
+        });
+
+    } else {
+    term_object[term] = value;
+    console.dir(term_object);
+    client.search({
+        index: 'iniciativas',
+        body: {
+            "query" : {
+                "filtered" : { 
+                    "query" : {
+                        "match_all" : {} 
+                    },
+                    "filter" : {
+                        "term" : term_object
+                    }
+                }
+            }
+        }
+    }, function(error, response) {
+        res.send(response);
+    });
+    }
+
+};
 
 exports.search = function(req, res, next) {
     console.log(req.params.q);

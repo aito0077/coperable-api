@@ -54,6 +54,7 @@ server.get('/api/iniciativa/s_name/:name', iniciativas.findByName);
 server.post('/api/iniciativa/search', iniciativas.findByQuery);
 server.get('/api/iniciativa/aggregations', iniciativas.aggregations);
 server.get('/api/iniciativa/search', iniciativas.search);
+server.get('/api/iniciativa/search-term', iniciativas.search_by_term);
 server.get('/api/iniciativa/:id', iniciativas.findById);
 server.get('/api/iniciativa/withOwnerAndMembers/:number_of_members/:id', iniciativas.findByIdWithOwnerAndMembers);
 
