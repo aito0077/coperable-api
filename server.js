@@ -60,6 +60,7 @@ server.get('/api/iniciativa/withOwnerAndMembers/:number_of_members/:id', iniciat
 
 server.post('/api/iniciativa', iniciativas.create);
 server.post('/api/iniciativa/:id', iniciativas.save);
+server.del('/api/iniciativa/:id', iniciativas.remove);
 server.post('/api/iniciativa/:id/:userId', iniciativas.participate);
 server.post('/api/iniciativa/:id/:userId/quit', iniciativas.quitIniciativa);
 

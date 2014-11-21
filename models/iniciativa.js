@@ -299,10 +299,11 @@ exports.update = function(iniciativa, success, error) {
 
 exports.remove = function(id, success, error) {
 
-    Iniciativa.remove({code: id}, function(err) {
+    Iniciativa.remove({_id: id}, function(err) {
         if(err) {
             error(err);
         } else {
+            console.log('Removido iniciativa : '+id);
             success();
         }
     });

@@ -249,6 +249,45 @@ exports.save = function(req, res, next) {
     });
 }
 
+exports.remove = function(req, res, next) {
+    var iniciativa_id = req.params.id;
+    Iniciativa.Model.findById(iniciativa_id, function (err, iniciativa) {
+
+            if(iniciativa.owner) {
+                Usuario.Model.update(
+                    {
+                        _id: iniciativa.owner.user
+                    },
+                    {
+
+                        $pull: { 
+                            'ownedIniciativas': { id: iniciativa_id } 
+                        } 
+                    },
+                    {},
+                    function updatingUsuario(errUsuario, numUsuarioAffected) {
+                        Iniciativa.Model.remove({_id: iniciativa_id}, function (err) {
+                            if (err) return handleError(err);
+                            res.send(iniciativa);
+
+                        });
+
+                    }
+                );
+            } else {
+                Iniciativa.Model.remove({_id: iniciativa_id}, function (err) {
+
+                    if (err) return handleError(err);
+                    res.send(iniciativa);
+
+                });
+
+            }
+
+
+    });
+}
+
 exports.participate = function(req, res, next) {
     var iniciativaId = req.params.id,
         userId = req.params.userId;
