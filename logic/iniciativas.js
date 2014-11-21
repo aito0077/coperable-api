@@ -10,6 +10,11 @@ var Iniciativa = require('../models/iniciativa.js'),
     _ = require('underscore');
 
 exports.list = function(req, res, next) {
+	var limit = req.params.limit || 60;
+	  Iniciativa.Model.find().where('profile_picture').exists(true).where('owner').exists(true).sort('-start_date').limit(limit).exec(function (err, data) {
+	    res.send(data);
+	  });
+/*
     Iniciativa.list(
         function(data) {
             res.send(data);
@@ -18,6 +23,7 @@ exports.list = function(req, res, next) {
             res.send(err);
         }
     );
+*/
 };
 
 exports.search_by_term = function(req, res, next) {
@@ -434,12 +440,13 @@ exports.findLast = function(req, res, next) {
 
     Iniciativa.Model.find(
         {
-            end_date: { $gt: yesterday },
+            end_date: { $gt: yesterday } /*,
             coords:
             {
                 $near : [lng, lat],
                 $maxDistance : 500/111.2
             }
+		*/
         }).where('profile_picture').exists(true).sort('-start_date').limit(limit)
         .exec(function(err, result) {
             if(result) {

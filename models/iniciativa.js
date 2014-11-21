@@ -108,7 +108,7 @@ var Iniciativa = mongoose.model('Iniciativa', IniciativaSchema);
 
 exports.Model = Iniciativa;
 
-var limit = 20;
+var limit = 60;
 
 exports.list = function(success) {
   Iniciativa.find().where('profile_picture').exists(true).sort('-start_date').limit(limit).exec(function (err, data) {
