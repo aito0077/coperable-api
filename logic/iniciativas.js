@@ -11,9 +11,16 @@ var Iniciativa = require('../models/iniciativa.js'),
 
 exports.list = function(req, res, next) {
 	var limit = req.params.limit || 60;
-	  Iniciativa.Model.find().where('profile_picture').exists(true).where('owner').exists(true).sort('-start_date').limit(limit).exec(function (err, data) {
-	    res.send(data);
-	  });
+		skip_filters = req.params.skip_filters;
+		if(skip_filters) {
+			Iniciativa.Model.find().sort('-start_date').limit(limit).exec(function (err, data) {
+				res.send(data);
+			});
+		} else {
+			Iniciativa.Model.find().where('profile_picture').exists(true).where('owner').exists(true).sort('-start_date').limit(limit).exec(function (err, data) {
+				res.send(data);
+			});
+		}
 /*
     Iniciativa.list(
         function(data) {
@@ -140,7 +147,7 @@ exports.browseByCategory = function(req, res, next) {
     if(category == 'all') {
         Iniciativa.Model.find({
             end_date: { $gt: yesterday }
-        }).where('profile_picture').exists(true).exec(
+        }).where('profile_picture').exists(true).where('owner').exists(true).exec(
             function (err, iniciativas) {
                 if (err) return handleError(err);
                 res.send(iniciativas);
@@ -149,7 +156,7 @@ exports.browseByCategory = function(req, res, next) {
     } else {
         Iniciativa.Model.find({
             end_date: { $gt: yesterday }
-        }).where('profile_picture').exists(true).where('categories.'+category).equals(true).exec(
+        }).where('profile_picture').exists(true).where('owner').exists(true).where('categories.'+category).equals(true).exec(
             function (err, iniciativas) {
                 if (err) return handleError(err);
                 res.send(iniciativas);
@@ -447,7 +454,7 @@ exports.findLast = function(req, res, next) {
                 $maxDistance : 500/111.2
             }
 		*/
-        }).where('profile_picture').exists(true).sort('-start_date').limit(limit)
+        }).where('profile_picture').exists(true).where('owner').exists(true).sort('-start_date').limit(limit)
         .exec(function(err, result) {
             if(result) {
                 console.log("[iniciativa.js findLast] Resultados: " + result.length);
@@ -514,7 +521,7 @@ exports.findByIdWithOwnerAndMembers = function(req, res, next) {
 exports.get_by_comunidad = function(comunidad_id, next) {
     Iniciativa.Model.find({
         end_date: { $gt: yesterday }
-    }).where('profile_picture').exists(true).where('categories.'+category).equals(true).exec(
+    }).where('profile_picture').exists(true).where('owner').exists(true).where('categories.'+category).equals(true).exec(
         function (err, iniciativas) {
             if (err) return handleError(err);
             res.send(iniciativas);

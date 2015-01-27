@@ -76,7 +76,7 @@ var UsuarioSchema = new Schema({
 
 });
 
-var limit = 20;
+var limit = 150;
 
 UsuarioSchema.pre('save', function(next) {
     var user = this;
@@ -118,7 +118,7 @@ var Usuario = mongoose.model('Usuario', UsuarioSchema);
 exports.Model = Usuario;
 
 exports.list = function(success) {
-  Usuario.find().limit(limit).select('username first_name last_name email location iniciativas').exec(function (arr,data) {
+  Usuario.find().sort('-creation_date').limit(limit).select('username first_name last_name email location iniciativas').exec(function (arr,data) {
     success(data);
   });
 };
