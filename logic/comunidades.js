@@ -55,8 +55,6 @@ exports.findById = function(req, res, next) {
             var usuarios_id_array = _.pluck(result.members, 'user'),
                 iniciativas_id_array = result.iniciativas;
 
-            console.dir(usuarios_id_array);
-            console.dir(iniciativas_id_array);
 
             async.parallel({
                 miembros: function(callback){
@@ -83,7 +81,6 @@ exports.findById = function(req, res, next) {
                 var total_result = _.extend({
                     comunidad: result
                 }, results);
-                console.dir(total_result);
 
                 res.send(total_result);
             });
@@ -96,9 +93,7 @@ exports.findById = function(req, res, next) {
 
 exports.findByQuery = function(req, res, next) {
     var query= req.body;
-    console.log("Find by query");
     Comunidad.Model.find(query).sort('start_date').exec(function(err, result) {
-        console.dir(result);
         console.log(err);
         if(result) {
             res.send(result);
@@ -110,10 +105,6 @@ exports.findByQuery = function(req, res, next) {
 
 exports.add_iniciativa_to_comunidades = function(iniciativa) {
 
-    console.log("add iniciativas to comunidades");
-    console.dir(iniciativa.comunidades);
-    console.log(typeof(iniciativa.comunidades));
-        
     _.each(iniciativa.comunidades, function(comunidad) {
 
         exports.add_iniciativa_to_comunidad(iniciativa, comunidad);
@@ -123,7 +114,6 @@ exports.add_iniciativa_to_comunidades = function(iniciativa) {
 };
 
 exports.add_iniciativa_to_comunidad = function(iniciativa, comunidad) {
-    console.log('add_iniciativa_to_comunidad');
     Comunidad.Model.findById(comunidad._id, function (errr, comunidad_persist) {
         if (errr) {
              console.log(errr);
@@ -132,7 +122,6 @@ exports.add_iniciativa_to_comunidad = function(iniciativa, comunidad) {
         var owner_id = iniciativa.owner,
             iniciativa_id = iniciativa._id;
         console.log("Inicaitiva id: "+iniciativa_id+" owner: "+owner_id);
-        console.dir(comunidad_persist);
         comunidad_persist.update(
             { 
                 $addToSet: { 'iniciativas':  iniciativa_id , 'members': owner_id},

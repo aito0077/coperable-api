@@ -168,6 +168,7 @@ exports.browseByCategory = function(req, res, next) {
 
 var updateTopicsList = function (iniciativa, done) {
     console.log("---------------------------------");
+    console.dir(iniciativa.topics);
     if (iniciativa.topics) {
         var topic_models = [];
         _.each(iniciativa.topics, function(topic) {
@@ -213,15 +214,17 @@ exports.create = function(req, res, next) {
                         function() {
                             try {
                                 updateTopicsList(data, function(topic_models) {
+                                    console.log("Updated topics");
                                     if(user.email) {
                                         send_mail_created(user, data);
                                     }
-                                    res.send(data);
                                 });
                             } catch(error) {
                                 console.log("Error en evio de mail: "+error);
                             }
                             comunidades.add_iniciativa_to_comunidades(data);
+
+                            res.send(data);
                         } 
                     );
                 }
@@ -231,6 +234,7 @@ exports.create = function(req, res, next) {
 
         },
         function(err) {
+            console.log('error');
             console.log(err);
             res.send({error: err});
         }
