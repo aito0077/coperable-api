@@ -5,7 +5,7 @@ var Iniciativa = require('../models/iniciativa.js'),
     Topic = require('../models/topic.js'),
     es = require('elasticsearch'),
     client = new es.Client({
-        host: 'localhost:9200'
+        host: 'http://104.236.192.8:8080'
     }),
     _ = require('underscore');
 

@@ -110,7 +110,11 @@ UsuarioSchema.methods.comparePassword = function(candidatePassword, callback) {
     });
 };
 
-UsuarioSchema.plugin(mongoosastic);
+UsuarioSchema.plugin(mongoosastic, {
+	hosts: [
+		'http://104.236.192.8:8080'
+	]
+});
 
 
 var Usuario = mongoose.model('Usuario', UsuarioSchema);

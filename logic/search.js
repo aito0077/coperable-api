@@ -5,7 +5,7 @@ var es = require('elasticsearch'),
  
 exports.bulk_insert = function(req, res, next) {
     var client = new es.Client({
-        host: 'localhost:9200'
+        host: 'http://104.236.192.8:8080'
     });
     model.Model.find().exec(function(errr, data) {
             if(errr) {
@@ -63,13 +63,16 @@ exports.synchronize_iniciativas = function(req, res, next) {
     stream.on('data', function(err, doc){
         count++;
     });
+
+    stream.on('index', function(){
+        console.log({message: 'indexed ' + count + ' documents!'});
+    });
+
     stream.on('close', function(){
         console.log({message: 'indexed ' + count + ' documents!'});
-        next('indexed ' + count + ' documents!');
     });
     stream.on('error', function(err){
         console.log(err);
-        next(err);
     });
 
 };
@@ -95,7 +98,7 @@ exports.synchronize_usuarios = function(req, res, next) {
 
 exports.delete_indices = function(req, res, next) {
     var client = new es.Client({
-        host: 'localhost:9200'
+        host: 'http://104.236.192.8:8080'
     });
     var callback = function(err, resp) {
         if (err) { 

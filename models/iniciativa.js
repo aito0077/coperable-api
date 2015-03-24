@@ -102,7 +102,11 @@ IniciativaSchema.index ({
        coords : "2d"
 });
 
-IniciativaSchema.plugin(mongoosastic);
+IniciativaSchema.plugin(mongoosastic, {
+	hosts: [
+		'http://104.236.192.8:8080'
+	]
+});
 
 var Iniciativa = mongoose.model('Iniciativa', IniciativaSchema);
 
