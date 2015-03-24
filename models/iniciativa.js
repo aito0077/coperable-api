@@ -20,6 +20,11 @@ var IniciativaSchema = new Schema({
     phone:   String,
     email:   String,
     entrada:   String,
+    comments:   String,
+    contact:   String,
+    organization:   String,
+    country:   String,
+    city:   String,
     main_category: String,
     categories: {
         medio_ambiente: {type: Boolean, default: false},
@@ -54,6 +59,7 @@ var IniciativaSchema = new Schema({
     topics: [String],
     public: { type: Boolean, default: false},
     feca: { type: Boolean, default: false},
+    minka: { type: Boolean, default: false},
     stages: [{
         stage: String,
         description: String,
