@@ -269,8 +269,17 @@ exports.save = function(req, res, next) {
 
 exports.remove = function(req, res, next) {
     var iniciativa_id = req.params.id;
-    Iniciativa.Model.findById(iniciativa_id, function (err, iniciativa) {
+    client.delete({
+        index: 'iniciativas',
+        type: 'iniciativa',
+        id: iniciativa_id
+    }, function (error, response) {
+        console.log('Error: elasticsearch: '+error);
+        console.log('remove from elasticsearch');
+    });
 
+
+    Iniciativa.Model.findById(iniciativa_id, function (err, iniciativa) {
             if(iniciativa.owner) {
                 Usuario.Model.update(
                     {
