@@ -102,6 +102,10 @@ UsuarioSchema.pre('save', function(next) {
 });
 
 UsuarioSchema.methods.comparePassword = function(candidatePassword, callback) {
+
+    if(!this.password ){
+        callback(null, false);
+    }
     bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
         if (err) {
             return callback(err);

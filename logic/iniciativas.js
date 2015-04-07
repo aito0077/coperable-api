@@ -168,17 +168,18 @@ exports.browseByCategory = function(req, res, next) {
 
 var updateTopicsList = function (iniciativa, done) {
     console.log("---------------------------------");
-    console.dir(iniciativa.topics);
-    if (iniciativa.topics) {
+    if (!_.isEmpty(iniciativa.topics)) {
         var topic_models = [];
         _.each(iniciativa.topics, function(topic) {
             Topic.update(topic, iniciativa._id, function(data) {
                 topic_models.push(data);
                 if (topic_models.length === iniciativa.topics.length) {
-                    done(topic_models);
+                    done();
                 }
             });
         });
+    } else {
+        done();
     }
 };
 
@@ -213,7 +214,7 @@ exports.create = function(req, res, next) {
                         },
                         function() {
                             try {
-                                updateTopicsList(data, function(topic_models) {
+                                updateTopicsList(data, function() {
                                     console.log("Updated topics");
                                     if(user.email) {
                                         send_mail_created(user, data);
@@ -259,7 +260,7 @@ exports.save = function(req, res, next) {
         _.extend(iniciativa, body);
         iniciativa.save(function (err) {
             if (err) return handleError(err);
-            updateTopicsList(data, function(iniciativa) {
+            return updateTopicsList(iniciativa, function() {
                 res.send(iniciativa);
             });
         });
