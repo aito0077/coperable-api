@@ -88,7 +88,6 @@ exports.update = function(comunidad, success, error) {
 
 
 exports.remove = function(id, success, error) {
-
     Comunidad.remove({code: id}, function(err) {
         if(err) {
             error(err);

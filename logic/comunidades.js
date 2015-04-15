@@ -178,5 +178,16 @@ exports.remove_iniciativa_from_comunidad = function(iniciativa, comunidad) {
     });
 };
 
+exports.remove = function(req, res, next) {
+    var comunidad_id = req.params.id;
+    Comunidad.Model.findById(comunidad_id, function (err, comunidad) {
+        Comunidad.Model.remove({_id: comunidad_id}, function (err) {
 
+            if (err) return handleError(err);
+            res.send(comunidad);
+
+        });
+
+    });
+};
 

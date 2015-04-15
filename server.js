@@ -68,7 +68,7 @@ server.get('/api/comunidades', comunidades.list);
 server.get('/api/comunidades/:id', comunidades.findById);
 server.post('/api/comunidades/:id', comunidades.save);
 server.post('/api/comunidades', comunidades.create);
-server.post('/api/comunidades/search', iniciativas.findByQuery);
+server.del('/api/comunidades/:id', comunidades.remove);
 
 server.post('/api/tags', iniciativas.getTags);
 
