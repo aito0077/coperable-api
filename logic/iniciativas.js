@@ -557,10 +557,10 @@ exports.get_by_comunidad = function(comunidad_id, next) {
 send_mail_created = function(owner, iniciativa) {
        var transporter = nodemailer.createTransport();
        var data_to_send = {
-           from: 'info@coperable.com.ar',
+           from: 'coperable@coperable.com.ar',
            to: owner.email,
            subject: 'Iniciativa Creada',
-           text: 'Estos son los datos de la iniciativa: '+iniciativa.name+' link: http://coperable.com.ar/iniciativas/'+iniciativa._id
+           text: 'Muy bueno! creaste la iniciativa '+iniciativa.name+', comparte el siguiente link para invitar a otros a participar: http://coperable.com.ar/iniciativas/'+iniciativa._id
        };
     console.dir(transporter);
        transporter.sendMail(data_to_send, function(err, info) {
