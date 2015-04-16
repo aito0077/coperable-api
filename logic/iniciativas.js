@@ -471,8 +471,18 @@ exports.findLast = function(req, res, next) {
         }).where('profile_picture').exists(true).where('owner').exists(true).sort('-start_date').limit(limit)
         .exec(function(err, result) {
             if(result) {
-                console.log("[iniciativa.js findLast] Resultados: " + result.length);
-                res.send(result);
+                if(result.length > 0) {
+                    console.log("[iniciativa.js findLast] Resultados: " + result.length);
+                    res.send(result);
+                } else {
+                    Iniciativa.Model.find().where('profile_picture').exists(true).where('owner').exists(true).sort('-start_date').limit(limit)
+                        .exec(function(err, alternativas) {
+                        
+                            res.send(alternativas);
+                            
+                        });
+
+                }
             } else {
                 console.log("[iniciativa.js findLast] Resultados: 0");
                 res.send(404, {});
