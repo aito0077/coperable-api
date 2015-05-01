@@ -6,6 +6,7 @@ var Iniciativa = require('../models/iniciativa.js'),
     es = require('elasticsearch'),
     client = new es.Client({
         host: 'http://104.236.192.8:8080'
+        //host: 'http://localhost:9200'
     }),
     _ = require('underscore');
 
@@ -130,12 +131,15 @@ exports.browseByUser = function(req, res, next) {
     var user_id = req.params.user_id; 
 
     console.log('Buscando por usuario: '+user_id);
-    Iniciativa.Model.find('{owner.user:user_id}').exec(
-        function (err, iniciativas) {
-            if (err) return handleError(err);
-            res.send(iniciativas);
-        }
-    );
+    Iniciativa.Model.find('{owner.user:user_id}')
+        .where('profile_picture').exists(true)
+        .sort('start_date')
+        .exec(
+            function (err, iniciativas) {
+                if (err) return handleError(err);
+                res.send(iniciativas);
+            }
+        );
 
 };
 

@@ -6,6 +6,7 @@ var es = require('elasticsearch'),
 exports.bulk_insert = function(req, res, next) {
     var client = new es.Client({
         host: 'http://104.236.192.8:8080'
+        //host: 'http://localhost:9200'
     });
     model.Model.find().exec(function(errr, data) {
             if(errr) {
@@ -98,7 +99,8 @@ exports.synchronize_usuarios = function(req, res, next) {
 
 exports.delete_indices = function(req, res, next) {
     var client = new es.Client({
-        host: 'http://104.236.192.8:8080'
+        //host: 'http://104.236.192.8:8080'
+        host: 'http://localhost:9200'
     });
     var callback = function(err, resp) {
         if (err) { 

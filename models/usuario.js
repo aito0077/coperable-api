@@ -11,6 +11,9 @@ var UsuarioSchema = new Schema({
     first_name:   String,
     last_name:   String,
     email:   String,
+    organization_name: String,
+    contact_email: String,
+    website: String,
     location:   String,
     facebook_id:   String,
     twitter_id:   String,
@@ -47,6 +50,8 @@ var UsuarioSchema = new Schema({
         description: { type: Date, default: Date.now },
         refers_to: String
     }],
+    implementation: {type: String, default: ''},
+    implementation_admin: {type: Boolean, default: false},
     verified: { type: Boolean, default: false},
     last_time_access: { type: Date, default: Date.now },
     creation_date: { type: Date, default: Date.now },

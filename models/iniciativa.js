@@ -31,6 +31,8 @@ var IniciativaSchema = new Schema({
         educacion: {type: Boolean, default: false},
         desarrollo: {type: Boolean, default: false},
         arte_cultura: {type: Boolean, default: false},
+        bienestar: {type: Boolean, default: false},
+        deporte: {type: Boolean, default: false}
     },
     owner: {
         user: String,
@@ -60,6 +62,7 @@ var IniciativaSchema = new Schema({
     public: { type: Boolean, default: false},
     feca: { type: Boolean, default: false},
     minka: { type: Boolean, default: false},
+    implementation: {type: String, default: ''},
     stages: [{
         stage: String,
         description: String,
