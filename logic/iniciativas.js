@@ -221,7 +221,11 @@ exports.create = function(req, res, next) {
                                 updateTopicsList(data, function() {
                                     console.log("Updated topics");
                                     if(user.email) {
-                                        send_mail_created(user, data);
+                                        if(data.implementation == 'chascomus') {
+                                            send_mail_chascomus_created(user, data);
+                                        } else {
+                                            send_mail_created(user, data);
+                                        }
                                     }
                                 });
                             } catch(error) {
@@ -571,12 +575,11 @@ exports.get_by_comunidad = function(comunidad_id, next) {
 send_mail_created = function(owner, iniciativa) {
        var transporter = nodemailer.createTransport();
        var data_to_send = {
-           from: 'coperable@coperable.com.ar',
+           from: 'coperable@coperable.org',
            to: owner.email,
            subject: 'Iniciativa Creada',
-           text: 'Muy bueno! creaste la iniciativa '+iniciativa.name+', comparte el siguiente link para invitar a otros a participar: http://coperable.com.ar/iniciativas/'+iniciativa._id
+           text: 'Muy bueno! creaste la iniciativa '+iniciativa.name+', comparte el siguiente link para invitar a otros a participar: http://coperable.org/iniciativas/'+iniciativa._id
        };
-    console.dir(transporter);
        transporter.sendMail(data_to_send, function(err, info) {
 
         console.log("Error sending? "+err);
@@ -585,4 +588,19 @@ send_mail_created = function(owner, iniciativa) {
        });
 };
     
+send_mail_chascomus_created = function(owner, iniciativa) {
+       var transporter = nodemailer.createTransport();
+       var data_to_send = {
+           from: 'coperable@coperable.org',
+           to: owner.email,
+           subject: 'Actividad Creada',
+           text: 'Muy bueno! creaste la actividad '+iniciativa.name+', comparte el siguiente link para invitar a otros a participar: http://chascomus.coperable.org/iniciativas/'+iniciativa._id
+       };
+       transporter.sendMail(data_to_send, function(err, info) {
+
+        console.log("Error sending? "+err);
+        console.dir(info);
+        console.log("Inicaitvia enviada");
+       });
+};
 
