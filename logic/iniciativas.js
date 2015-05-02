@@ -131,7 +131,7 @@ exports.browseByUser = function(req, res, next) {
     var user_id = req.params.user_id; 
 
     console.log('Buscando por usuario: '+user_id);
-    Iniciativa.Model.find('{owner.user:user_id}')
+    Iniciativa.Model.find({'owner.user': user_id})
         .where('profile_picture').exists(true)
         .sort('start_date')
         .exec(
