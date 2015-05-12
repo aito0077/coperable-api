@@ -67,13 +67,16 @@ exports.synchronize_iniciativas = function(req, res, next) {
 
     stream.on('index', function(){
         console.log({message: 'indexed ' + count + ' documents!'});
+        next('indexed ' + count + ' documents!');
     });
 
     stream.on('close', function(){
         console.log({message: 'indexed ' + count + ' documents!'});
+        next('indexed ' + count + ' documents!');
     });
     stream.on('error', function(err){
         console.log(err);
+        next(err);
     });
 
 };
@@ -99,8 +102,8 @@ exports.synchronize_usuarios = function(req, res, next) {
 
 exports.delete_indices = function(req, res, next) {
     var client = new es.Client({
-        //host: 'http://104.236.192.8:8080'
-        host: 'http://localhost:9200'
+        host: 'http://104.236.192.8:8080'
+        //host: 'http://localhost:9200'
     });
     var callback = function(err, resp) {
         if (err) { 

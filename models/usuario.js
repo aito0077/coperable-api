@@ -122,6 +122,7 @@ UsuarioSchema.methods.comparePassword = function(candidatePassword, callback) {
 UsuarioSchema.plugin(mongoosastic, {
 	hosts: [
 		'http://104.236.192.8:8080'
+		//'http://localhost:9200'
 	]
 });
 

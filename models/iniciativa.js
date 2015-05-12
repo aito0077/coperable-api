@@ -23,6 +23,7 @@ var IniciativaSchema = new Schema({
     comments:   String,
     contact:   String,
     organization:   String,
+    website: String,
     country:   String,
     city:   String,
     main_category: String,
@@ -58,7 +59,13 @@ var IniciativaSchema = new Schema({
         tag: String,
         description: String
     }],
-    topics: [String],
+    //topics: [String],
+    topics: {
+        type: Array,
+        es_type: 'string',
+        index: 'not_analyzed'
+    },
+
     public: { type: Boolean, default: false},
     feca: { type: Boolean, default: false},
     minka: { type: Boolean, default: false},
@@ -114,6 +121,7 @@ IniciativaSchema.index ({
 IniciativaSchema.plugin(mongoosastic, {
 	hosts: [
 		'http://104.236.192.8:8080'
+		//'http://localhost:9200'
 	]
 });
 
