@@ -4,6 +4,8 @@ var mongoose = require('mongoose/'),
     iniciativas = require('./logic/iniciativas.js'),
     search = require('./logic/search.js'),
     comunidades = require('./logic/comunidades.js'),
+    jwt = require('jwt-simple'),
+    moment = require('moment'),
     usuarios = require('./logic/users.js');
 
 if( process.env.VCAP_SERVICES ){
@@ -41,10 +43,16 @@ var server = restify.createServer({
 });
 server.use(restify.bodyParser({ mapParams: false }));
 
-
 server.use(restify.CORS());
 server.use(restify.fullResponse());
 server.use(restify.queryParser());
+server.use(
+  function crossOrigin(req,res,next){
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    return next();
+  }
+);
 
 server.get('/api/iniciativa', iniciativas.list);
 server.get('/api/iniciativa/user/:user_id', iniciativas.browseByUser);
@@ -87,6 +95,34 @@ server.get('/api/es/synchronize_iniciativas', search.synchronize_iniciativas);
 server.get('/api/es/synchronize_usuarios', search.synchronize_usuarios);
 server.get('/api/es/delete_indices', search.delete_indices);
 
+server.get('/api/auth/login', usuarios.login);
+server.post('/api/auth/login', usuarios.login);
+server.get('/api/auth/signup', usuarios.signup);
+server.post('/api/auth/signup', usuarios.signup);
+server.post('/api/auth/facebook', usuarios.auth_facebook);
+server.post('/api/auth/twitter', usuarios.auth_twitter);
+
+function ensureAuthenticated(req, res, next) {
+    if (!req.headers.authorization) {
+        return res.send(401, { message: 'Please make sure your request has an Authorization header' });
+    }
+    var token = req.headers.authorization.split(' ')[1];
+
+    var payload = null;
+    try {
+        payload = jwt.decode(token, config.server.TOKEN_SECRET);
+    } catch (err) {
+        return res.send(401, { message: err.message });
+    }
+
+    if (payload.exp <= moment().unix()) {
+        return res.send(401, { message: 'Expiro sesion' });
+    }
+    req.user = payload.sub;
+    next();
+}
+
+server.get('/api/auth/me', ensureAuthenticated, usuarios.me);
 
 server.listen(config.server.port, config.server.host, function() {
       console.log('%s listening at %s', server.name, server.url);

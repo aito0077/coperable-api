@@ -6,18 +6,22 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "request": "*",
-    "restify": "*",
-    "underscore": "1.4.4",
-    "mongoose": "3.8.20",
-    "bcrypt": "0.7.5",
     "async": "*",
-    "nodemailer": "0.7",
-    "nodemailer-smtp-transport": "*",
-    "nodemailer-direct-transport": "*",
+    "bcrypt": "0.7.5",
+    "body-parser": "^1.13.1",
+    "cors": "^2.7.1",
+    "elasticsearch": "3.1.3",
     "email-templates": "0.0.5",
-    "validator": "1.1.1",
+    "jwt-simple": "^0.3.0",
+    "moment": "^2.10.3",
     "mongoosastic": "*",
-    "elasticsearch": "3.1.3"
+    "mongoose": "3.8.20",
+    "nodemailer": "0.7",
+    "nodemailer-direct-transport": "*",
+    "nodemailer-smtp-transport": "*",
+    "request": "^2.58.0",
+    "restify": "^3.0.3",
+    "underscore": "1.4.4",
+    "validator": "1.1.1"
   }
 }
