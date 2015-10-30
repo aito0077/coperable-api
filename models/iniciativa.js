@@ -33,7 +33,11 @@ var IniciativaSchema = new Schema({
         desarrollo: {type: Boolean, default: false},
         arte_cultura: {type: Boolean, default: false},
         bienestar: {type: Boolean, default: false},
-        deporte: {type: Boolean, default: false}
+        deporte: {type: Boolean, default: false},
+        residencia: {type: Boolean, default: false},
+        formacion: {type: Boolean, default: false},
+        investigacion: {type: Boolean, default: false},
+        evento: {type: Boolean, default: false}
     },
     owner: {
         user: String,
@@ -272,7 +276,13 @@ exports.insert = function(iniciativa, success, error) {
             medio_ambiente: false,
             educacion: false,
             desarrollo: false,
-            arte_cultura: false
+            arte_cultura: false,
+            bienestar: false,
+            deporte: false,
+            residencia: false,
+            formacion: false,
+            investigacion: false,
+            evento: false
         },
         location: {
             latitude: iniciativa.location.latitude,
